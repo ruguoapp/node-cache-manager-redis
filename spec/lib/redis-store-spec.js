@@ -1,6 +1,9 @@
+var redis = require('redis');
+var Promise = require('bluebird');
+var sinon = require('sinon');
+
 var config = require('../config.json');
 var redisStore = require('../../index');
-var sinon = require('sinon');
 
 var redisCache;
 
@@ -241,7 +244,7 @@ describe('overridable isCacheableValue function', function () {
 describe('multi get', function () {
   it('should merge redis request', function (done) {
     var redis = require('redis');
-    // mock
+    // spy
     var _mget = redis.RedisClient.prototype.mget;
     var callCount = 0;
     redis.RedisClient.prototype.mget = function () {
@@ -250,18 +253,27 @@ describe('multi get', function () {
       _mget.apply(this, arguments);
     };
 
-    var resCount = 0;
-
-    redisCache.get('foo', function (err, res) {
-      expect(err).toBe(null);
-      expect(res).toBe('bar');
-      ++resCount && done();
-    });
-    redisCache.get('foo1', function (err, res) {
-      expect(err).toBe(null);
-      ++resCount && done();
-    });
+    Promise.map(['foo', 'foo1'], function(key){
+      return new Promise(function (resolve, reject) {
+        redisCache.get(key, function (err, value) {
+          if(err){
+            reject(err);
+          }else{
+            resolve(value);
+          }
+        });
+      });
+    }).then(function(values){
+      expect(values.length).toBe(2);
+      expect(values).toContain('bar');
+      expect(values).toContain(null);
+    }).then(function(){
+      // restore
+      redis.RedisClient.prototype.mget = _mget;
+      done();
+    }, done);
   });
+
 });
 
 // describe('defaults', function() {
