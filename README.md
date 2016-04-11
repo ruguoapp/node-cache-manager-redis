@@ -7,8 +7,9 @@ The Redis store for the [node-cache-manager](https://github.com/BryanDonovan/nod
 
 Changes on original repo
 ------------
-- remove redis pool which is not necessary. See https://github.com/NodeRedis/node_redis/issues/226
-- use mget command to merge redis requests.
+
+- Remove `redis-pool` which is not necessary. See https://github.com/NodeRedis/node_redis/issues/226
+- Use `mget` command to merge redis requests.
 
 Installation
 ------------

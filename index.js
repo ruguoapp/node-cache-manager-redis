@@ -100,19 +100,6 @@ function redisStore(args) {
     }));
   };
 
-  self.batchGet = function (keys, options, cb) {
-    if (!Array.isArray(keys)) {
-
-    }
-
-    if (typeof options === 'function') {
-      cb = options;
-    }
-    addRequest(keys, handleResponse(cb, {
-      parse: true
-    }));
-  };
-
   /**
    * Set a value for a given key.
    * @method set

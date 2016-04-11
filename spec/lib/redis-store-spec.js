@@ -51,17 +51,6 @@ describe('set', function () {
       done();
     });
   });
-
-  // controlled by cache-manage
-  // it('should not store an invalid value', function(done) {
-  //   redisCache.set('foo1', undefined, function(){
-  //     redisCache.get('foo1', function(err, value) {
-  //       expect(err).toBe(null);
-  //       expect(value).toBe(null);
-  //       done();
-  //     });
-  //   });
-  // });
 });
 
 describe('get', function () {
@@ -253,44 +242,26 @@ describe('multi get', function () {
       _mget.apply(this, arguments);
     };
 
-    Promise.map(['foo', 'foo1'], function(key){
+    Promise.map(['foo', 'foo1'], function (key) {
       return new Promise(function (resolve, reject) {
         redisCache.get(key, function (err, value) {
-          if(err){
+          if (err) {
             reject(err);
-          }else{
+          } else {
             resolve(value);
           }
         });
       });
-    }).then(function(values){
+    }).then(function (values) {
       expect(values.length).toBe(2);
       expect(values).toContain('bar');
       expect(values).toContain(null);
-    }).then(function(){
+    }).then(function () {
       // restore
       redis.RedisClient.prototype.mget = _mget;
       done();
     }, done);
   });
-
 });
 
-// describe('defaults', function() {
-//   var redisCache2;
-//
-//   beforeAll(function() {
-//     redisCache2 = require('cache-manager').caching({
-//       store: redisStore
-//     });
-//   });
-//
-//   it('should default the host to `127.0.0.1`', function() {
-//     expect(redisCache2.store._pool._redis_host).toBe('127.0.0.1');
-//   });
-//
-//   it('should default the port to 6379', function() {
-//     expect(redisCache2.store._pool._redis_port).toBe(6379);
-//   });
-// });
 
