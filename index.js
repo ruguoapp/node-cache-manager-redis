@@ -51,17 +51,13 @@ function redisStore(args) {
       return;
     }
     conn.mget(keys, function (err, values) {
-      if (err) {
-        console.error("Redis MGET error", err);
-        setImmediate(fulfillRequests);
-        return;
-      }
+      
       try {
         keys.forEach(function (key, i) {
           var cbs = requestQueue[key];
           delete requestQueue[key];
           cbs.forEach(function (cb) {
-            cb(err, values[i]);
+            cb(err, values && values[i]);
           });
         });
       } catch (e) {

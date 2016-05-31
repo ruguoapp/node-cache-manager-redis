@@ -290,16 +290,6 @@ describe('multi get', function () {
   it('should continue on redis error', function (done) {
     // spy
     var callCount = 0;
-    var _error = console.error;
-
-    // should log error
-    var errorLogged = false;
-    console.error = function (msg, err) {
-      expect(msg).toBe("Redis MGET error");
-      expect(err).not.toBeNull();
-      expect(err.message).toBe("some error happening on redis");
-      errorLogged = true;
-    };
 
     redis.RedisClient.prototype.mget = function (keys, callback) {
       if (callCount++ === 0) {
@@ -311,13 +301,16 @@ describe('multi get', function () {
 
     // should return result eventually
     redisCache.get('foo', function (err, value) {
-      expect(err).toBeNull();
-      expect(value).toBe("bar");
-      expect(errorLogged).toBeTruthy();
 
-      //revert mock
-      console.error = _error;
-      done();
+      expect(err).not.toBeNull();
+      expect(err.message).toBe("some error happening on redis");
+      expect(value).toBeUndefined();
+
+      redisCache.get('foo', function (err, value) {
+        expect(err).toBeNull();
+        expect(value).toBe("bar");
+        done();
+      });
     });
   });
 
