@@ -287,6 +287,34 @@ describe('multi get', function () {
     });
   });
 
+  it('should support buffer', function (done) {
+    var redisCache = require('cache-manager').caching({
+      store: redisStore,
+      return_buffers: true,
+      isCacheableValue: function () {
+        return 'I was overridden';
+      }
+    });
+    var val = new Buffer('bar');
+    console.log("val")
+    console.log(val)
+    redisCache.set("foo_buffer", val, function (err, result) {
+      if (err) {
+        done(err);
+      } else {
+        redisCache.get("foo_buffer", function (err, data) {
+          if (err) {
+            done(err);
+          } else {
+            expect(data).toEqual(val);
+            done();
+          }
+        });
+      }
+    });
+
+  });
+
 });
 
 

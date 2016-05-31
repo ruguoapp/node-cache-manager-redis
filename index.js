@@ -76,7 +76,7 @@ function redisStore(args) {
         return cb && cb(err);
       }
 
-      if (opts.parse) {
+      if (opts.parse && !Buffer.isBuffer(result)) {
         result = JSON.parse(result);
       }
 
@@ -94,8 +94,13 @@ function redisStore(args) {
    * @param {Function} cb - A callback that returns a potential error and the response
    */
   self.get = function (key, options, cb) {
+    var parse = true;
     if (typeof options === 'function') {
       cb = options;
+    } else {
+      if (options.parse === false) {
+        parse = false;
+      }
     }
 
     addRequest([key], handleResponse(cb, {
@@ -121,7 +126,7 @@ function redisStore(args) {
 
     var ttl = (options.ttl || options.ttl === 0) ? options.ttl : redisOptions.ttl;
 
-    var val = JSON.stringify(value);
+    var val = Buffer.isBuffer(value) ? value : JSON.stringify(value);
 
     if (ttl) {
       conn.setex(key, ttl, val, handleResponse(cb));
