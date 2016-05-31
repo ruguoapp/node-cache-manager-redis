@@ -4,7 +4,7 @@
   "description": "Redis store for the node-cache-manager",
   "main": "index.js",
   "scripts": {
-    "test": "sh test.sh",
+    "test": "./test.sh",
     "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/jasmine",
     "lint": "node_modules/.bin/jshint .",
     "jsdoc": "node_modules/.bin/jsdoc . --package package.json --readme README.md --template node_modules/minami --destination docs"
