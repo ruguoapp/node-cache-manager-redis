@@ -2,7 +2,7 @@ var redis = require('redis');
 var Promise = require('bluebird');
 var sinon = require('sinon');
 
-var config = require('../config.json');
+var config = require('../config');
 var redisStore = require('../../index');
 
 var redisCache;
