@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Wercker linked service will expose environment variable like $REDIS_PORT_6379_TCP_ADDR
 # See also http://devcenter.wercker.com/docs/services/linking-services.html
 if [[ -n "$REDIS_PORT_6379_TCP_ADDR" ]]; then
