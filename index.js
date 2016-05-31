@@ -51,13 +51,18 @@ function redisStore(args) {
       return;
     }
     conn.mget(keys, function (err, values) {
-      keys.forEach(function (key, i) {
-        var cbs = requestQueue[key];
-        delete requestQueue[key];
-        cbs.forEach(function (cb) {
-          cb(err, values[i]);
+      
+      try {
+        keys.forEach(function (key, i) {
+          var cbs = requestQueue[key];
+          delete requestQueue[key];
+          cbs.forEach(function (cb) {
+            cb(err, values && values[i]);
+          });
         });
-      });
+      } catch (e) {
+        console.error("Error handling mget result", e);
+      }
       setImmediate(fulfillRequests);
     });
   }

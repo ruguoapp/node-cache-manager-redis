@@ -2,7 +2,7 @@ var redis = require('redis');
 var Promise = require('bluebird');
 var sinon = require('sinon');
 
-var config = require('../config.json');
+var config = require('../config');
 var redisStore = require('../../index');
 
 var redisCache;
@@ -284,6 +284,33 @@ describe('multi get', function () {
         expect(redisCache.store._workerRunning).toBe(false);
         done();
       })
+    });
+  });
+
+  it('should continue on redis error', function (done) {
+    // spy
+    var callCount = 0;
+
+    redis.RedisClient.prototype.mget = function (keys, callback) {
+      if (callCount++ === 0) {
+        callback(new Error("some error happening on redis"), undefined);
+      } else {
+        callback(null, ['"bar"']);
+      }
+    };
+
+    // should return result eventually
+    redisCache.get('foo', function (err, value) {
+
+      expect(err).not.toBeNull();
+      expect(err.message).toBe("some error happening on redis");
+      expect(value).toBeUndefined();
+
+      redisCache.get('foo', function (err, value) {
+        expect(err).toBeNull();
+        expect(value).toBe("bar");
+        done();
+      });
     });
   });
 

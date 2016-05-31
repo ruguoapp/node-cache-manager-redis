@@ -1,0 +1,28 @@
+box: node:4
+
+services:
+  - redis
+
+build:
+  steps:
+    - script:
+        name: show environment variables
+        code: env
+    - script:
+        name: install node-gyp required packages
+        code: |
+          apt-get update
+          apt-get install -y python2.7 make gcc g++
+          dpkg -L python2.7-minimal
+    - script:
+        name: set python config for npm
+        code: npm config set python /usr/bin/python2.7
+    - npm-install:
+        options: "--registry http://npm.ruguoapp.com:4873"
+    - npm-test
+  after-steps:
+    - slack-notifier:
+        url: $SLACK_URL
+        channel: wercker
+        username: wercker
+        notify_on: failed
