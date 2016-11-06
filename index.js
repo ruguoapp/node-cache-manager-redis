@@ -10,6 +10,7 @@ var EventEmitter = require('events').EventEmitter;
  * @param {String} args.host - The Redis server host
  * @param {Number} args.port - The Redis server port
  * @param {Number} args.db - The Redis server db
+ * @param {function} args.createClient - A method to create a new Redis client
  * @param {function} args.isCacheableValue - function to override built-in isCacheableValue function (optional)
  */
 function redisStore(args) {
@@ -22,13 +23,17 @@ function redisStore(args) {
   /* istanbul ignore next */
   var redisOptions = args || {};
 
-  redisOptions.host = args.host || '127.0.0.1';
-  redisOptions.port = args.port || 6379;
-
-  var conn = redis.createClient(redisOptions.port, redisOptions.host, redisOptions);
-  conn.on('error', function (err) {
-    self.events.emit('redisError', err);
-  });
+  var conn;
+  if (redisOptions.createClient) {
+    conn = redisOptions.createClient();
+  } else {
+    redisOptions.host = args.host || '127.0.0.1';
+    redisOptions.port = args.port || 6379;
+    var conn = redis.createClient(redisOptions.port, redisOptions.host, redisOptions);
+    conn.on('error', function (err) {
+      self.events.emit('redisError', err);
+    });
+  }
 
   var requestQueue = {};
   self._workerRunning = false;
