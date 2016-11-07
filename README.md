@@ -46,6 +46,14 @@ redisCache.store.events.on('redisError', function(error) {
 	console.log(error);
 });
 
+// Pass in an existing node_redis compatible client
+var redisCache = cacheManager.caching({
+  store: redisStore,
+  createClient: function () {
+    return redis.createClient(...)
+  }
+});
+
 redisCache.set('foo', 'bar', ttl, function(err) {
     if (err) {
       throw err;
