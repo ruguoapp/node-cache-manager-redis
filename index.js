@@ -88,6 +88,15 @@ function redisStore(args) {
 
       if (opts.parse) {
         result = JSON.parse(result);
+        if(!result){
+          // return nothing
+        }
+        else if(result.isBuffer && result.value && result.value.type === 'Buffer' && result.value.data){
+          result = new Buffer(result.value.data);
+        }
+        else{
+          result = result.value;
+        }
       }
 
       if (cb) {
@@ -131,7 +140,10 @@ function redisStore(args) {
 
     var ttl = (options.ttl || options.ttl === 0) ? options.ttl : redisOptions.ttl;
 
-    var val = JSON.stringify(value);
+    var val = JSON.stringify({
+      value: value,
+      isBuffer: Buffer.isBuffer(value)
+    });
 
     if (ttl) {
       conn.setex(key, ttl, val, handleResponse(cb));

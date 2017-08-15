@@ -65,6 +65,17 @@ describe('get', function () {
     });
   });
 
+  it('should property get a Buffer value', function (done) {
+    var value = new Buffer('bar');
+    redisCache.set('foo', value, function () {
+      redisCache.get('foo', function (err, result) {
+        expect(err).toBe(null);
+        expect(result).toEqual(value);
+        done();
+      });
+    });
+  });
+
   it('should retrieve a value for a given key if options provided', function (done) {
     var value = 'bar';
     redisCache.set('foo', value, function () {
